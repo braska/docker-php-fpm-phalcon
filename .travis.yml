@@ -13,7 +13,7 @@ before_script:
   - IMAGE="braska/php-fpm-phalcon"
 
 script:
-  - docker build --build-arg PHALCON_VERSION=$PHALCON_VERSION --build-arg PHP_IMAGE_TAG=$PHP_IMAGE_TAG -t "$IMAGE:$PHP_IMAGE_TAG-$PHALCON_VERSION" .
+  - cat Dockerfile | sed "s/{{PHP_IMAGE_TAG}}/$PHP_IMAGE_TAG/" | docker build --build-arg PHALCON_VERSION=$PHALCON_VERSION --build-arg PHP_IMAGE_TAG=$PHP_IMAGE_TAG -t "$IMAGE:$PHP_IMAGE_TAG-$PHALCON_VERSION" -
   - docker images
 
 after_success:
