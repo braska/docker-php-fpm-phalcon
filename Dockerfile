@@ -1,26 +1,30 @@
-FROM centos:centos7
-MAINTAINER Danil Agafonov <mail@live-notes.ru>
+ARG PHP_IMAGE_TAG
+FROM php:${PHP_IMAGE_TAG}
+LABEL maintainer Danil Agafonov <mail@live-notes.ru>
 
-RUN \
-  rpm --rebuilddb && yum update -y && \
-  `# Install yum-utils (provides yum-config-manager) + some basic web-related tools...` \
-  yum install -y yum-utils wget patch mysql tar bzip2 unzip openssh-clients rsync make gcc libtool epel-release git && \
+ARG PHALCON_VERSION
 
-  `# Install PHP 5.6` \
-  rpm -Uvh http://rpms.famillecollet.com/enterprise/remi-release-7.rpm && \
-  yum-config-manager -q --enable remi && \
-  yum-config-manager -q --enable remi-php56 && \
-  yum install -y php-fpm php-bcmath php-cli php-gd php-intl php-mbstring \
-                  php-pecl-imagick php-mcrypt php-devel php-mysql php-opcache php-pdo && \
+ENV PHALCON_VERSION=${PHALCON_VERSION}
 
-  `# Install libs required to build some gem/npm packages (e.g. PhantomJS requires zlib-devel, libpng-devel)` \
-  yum install -y ImageMagick GraphicsMagick gcc gcc-c++ libffi-devel libpng-devel zlib-devel
+RUN apt-get update && apt-get install -y libmagickwand-dev --no-install-recommends && apt-get install -y \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libpng12-dev \
+    && rm -rf /var/lib/apt/lists/* \
+    && pecl install imagick && docker-php-ext-enable imagick \
+    && docker-php-ext-install mbstring iconv mcrypt pdo_mysql zip mysqli exif \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install gd
 
-RUN git clone --depth=1 git://github.com/phalcon/cphalcon.git /usr/local/src/cphalcon && cd /usr/local/src/cphalcon/build && ./install && \
-  echo "extension=phalcon.so" > /etc/php.d/60-phalcon.ini
-
-ADD etc /etc/
-
-EXPOSE 9000
-ENTRYPOINT ["php-fpm"]
-CMD ["-RF"]
+# Compile Phalcon
+RUN set -xe \
+    && curl -LO https://github.com/phalcon/cphalcon/archive/v${PHALCON_VERSION}.tar.gz \
+    && tar xzf v${PHALCON_VERSION}.tar.gz && cd cphalcon-${PHALCON_VERSION}/build && ./install \
+    && docker-php-ext-enable phalcon \
+    && cd ../.. && rm -rf v${PHALCON_VERSION}.tar.gz cphalcon-${PHALCON_VERSION} \
+    # Insall Phalcon Devtools, see https://github.com/phalcon/phalcon-devtools/
+    && curl -LO https://github.com/phalcon/phalcon-devtools/archive/v${PHALCON_VERSION}.tar.gz \
+    && tar xzf v${PHALCON_VERSION}.tar.gz \
+    && mv phalcon-devtools-${PHALCON_VERSION} /usr/local/phalcon-devtools \
+    && ln -s /usr/local/phalcon-devtools/phalcon.php /usr/local/bin/phalcon
