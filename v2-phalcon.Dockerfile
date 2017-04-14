@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y libmagickwand-dev --no-install-recommen
     && pecl install imagick && docker-php-ext-enable imagick \
     && docker-php-ext-install mbstring iconv mcrypt pdo_mysql zip mysqli exif \
     && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-install gd
+    && docker-php-ext-install gd \
     && echo 'ru_RU.UTF-8 UTF-8' >> /etc/locale.gen \
     && locale-gen
 
