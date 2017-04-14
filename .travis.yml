@@ -5,11 +5,18 @@ env:
   - PHP_IMAGE_TAG=5.6-fpm PHALCON_VERSION=2.0.10
   - PHP_IMAGE_TAG=7.1-fpm PHALCON_VERSION=3.1.2
 
+before_install:
+  - sudo apt-get update
+  - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-engine
+
 before_script:
   - IMAGE="braska/php-fpm-phalcon"
 
 script:
   - docker build --build-arg PHALCON_VERSION=$PHALCON_VERSION --build-arg PHP_IMAGE_TAG=$PHP_IMAGE_TAG -t "$IMAGE:$PHP_IMAGE_TAG-$PHALCON_VERSION" .
   - docker images
-  - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
+
+after_success:
+  - docker login -u="$DOCKER_HUB_USERNAME" -p="$DOCKER_HUB_PASSWORD"
   - docker push $IMAGE
+
