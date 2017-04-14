@@ -9,7 +9,7 @@ before_script:
   - IMAGE="braska/php-fpm-phalcon"
 
 script:
-  - docker build -t "$IMAGE:$PHP_IMAGE_TAG-$PHALCON_VERSION" .
+  - docker build --build-arg PHALCON_VERSION=$PHALCON_VERSION --build-arg PHP_IMAGE_TAG=$PHP_IMAGE_TAG -t "$IMAGE:$PHP_IMAGE_TAG-$PHALCON_VERSION" .
   - docker images
   - docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD
   - docker push $IMAGE

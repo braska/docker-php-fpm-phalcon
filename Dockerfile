@@ -1,4 +1,4 @@
-ARG PHP_IMAGE_TAG=7.1
+ARG PHP_IMAGE_TAG=7.1-fpm
 FROM php:${PHP_IMAGE_TAG}
 LABEL maintainer Danil Agafonov <mail@live-notes.ru>
 
