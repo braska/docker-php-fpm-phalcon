@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y libmagickwand-dev --no-install-recommen
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
-        libpng12-dev \
+        libpng-dev \
         locales \
     && rm -rf /var/lib/apt/lists/* \
     && pecl install imagick && docker-php-ext-enable imagick \
