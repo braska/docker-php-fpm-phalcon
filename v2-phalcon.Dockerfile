@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y libmagickwand-dev --no-install-recommen
 # Compile Phalcon
 RUN set -xe \
     && curl -LO https://github.com/phalcon/cphalcon/archive/phalcon-v${PHALCON_VERSION}.tar.gz \
-    && tar xzf phalcon-v${PHALCON_VERSION}.tar.gz && cd cphalcon-phalcon-v${PHALCON_VERSION}/build && ./install \
+    && tar xzf phalcon-v${PHALCON_VERSION}.tar.gz && cd cphalcon-phalcon-v${PHALCON_VERSION}/build/64bits && phpize && ./configure CFLAGS="-O2 -g" --enable-phalcon && make -B && make install \
     && docker-php-ext-enable phalcon \
     && cd ../.. && rm -rf phalcon-v${PHALCON_VERSION}.tar.gz cphalcon-phalcon-v${PHALCON_VERSION} \
     # Insall Phalcon Devtools, see https://github.com/phalcon/phalcon-devtools/
